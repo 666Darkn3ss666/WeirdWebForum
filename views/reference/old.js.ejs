@@ -1,0 +1,39 @@
+<script>
+const msgContainer = document.getElementById("messageContainer")
+
+function createMsg(from, to, text) {
+    let elem = document.createElement("p")
+    let data = "[" + from + "]{to " + to + "} " + text
+    elem.innerHTML = data
+    elem.classList.add("msg")
+    msgContainer.appendChild(elem)
+}
+
+function sendData() {
+    const text = document.getElementById("input").value
+    const recipient = document.getElementById("recipient").value
+    const data = {text: text, to: recipient}
+    postData("http://localhost:3000/test", data)
+        .then((data) => {
+            createMsg(data.from, data.to, data.text)
+        })
+}
+
+async function postData(url, data) {
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        body: JSON.stringify(data)
+    });
+    return response.json();
+}
+
+createMsg("SERVER", "all", "Welcome to Weird Webchat!")
+
+fetch("http://localhost:3000/test")
+    .then(res => res.json())
+    .then(data => createMsg(data.from, data.to, data.text))
+</script>

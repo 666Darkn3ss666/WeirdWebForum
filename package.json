@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "ejs": "^3.1.8",
+    "express": "^4.18.2",
+    "localtunnel": "^2.0.2",
+    "lt": "^0.3.3"
+  }
+}

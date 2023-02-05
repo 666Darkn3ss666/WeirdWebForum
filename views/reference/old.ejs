@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <%- include("old.css.ejs"); %>
+    
+</head>
+<body>
+    <div class="page">
+        <div class="header">
+            <h1 class="title">WeirdWebForum</h1>
+        </div>
+        <div class="messageContainer" id="messageContainer">
+
+        </div>
+        <div class="footer">
+            <input class="input" id="input" placeholder="Type your message here">
+            <input class="input" id="recipient" placeholder="Type userID or 'all' here">
+            <button class="btn" onclick="sendData()">Send</button>
+        </div>
+    </div>
+    <%- include("old.js.ejs"); %>
+</body>
+</html>

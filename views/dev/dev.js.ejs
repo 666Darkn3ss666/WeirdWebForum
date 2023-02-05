@@ -1,0 +1,29 @@
+<script>
+
+const input = document.getElementById("input")
+
+function stop() {
+    fetch("/dev/admin", {
+        method: "post",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({pswrd: input.value, action: "stop"})
+    })
+        .then(res => res.json())
+        .then(data => console.log(data))
+}
+
+function start() {
+    fetch("/dev/admin", {
+        method: "post",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({pswrd: input.value, action: "start"})
+    })
+        .then(res => res.json())
+        .then(data => console.log(data))
+}
+
+</script>

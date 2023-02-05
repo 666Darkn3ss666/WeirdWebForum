@@ -1,0 +1,32 @@
+<script>
+
+const userInfo = JSON.parse(localStorage.getItem("userInfo"))
+if (userInfo != null) {
+    if (userInfo.remember === false) {
+        localStorage.clear("userInfo")
+    }
+}
+
+async function login() {
+    const username = document.getElementById("usernameIn").value
+    const password = document.getElementById("passwordIn").value
+    const remember = document.getElementById("remember").checked
+    fetch("/users/login", {
+        method: "post",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({username: username, password: password})
+    })
+        .then(res => res.json())
+        .then(data => {if (data.foundUser === false) {
+            alert("Username or password is incorrect")
+        } else if (data.foundUser === true) {
+            alert("Login succeeded")
+            localStorage.clear("userInfo")
+            localStorage.setItem("userInfo", JSON.stringify({remember: remember, username: username, password: password}))
+            location.pathname = "/home"
+        }})
+}
+
+</script>
