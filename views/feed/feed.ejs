@@ -2,22 +2,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <%- include("friends.css.ejs"); %>
+    <%- include("feed.css.ejs"); %>
     
 </head>
 <body>
     <div class="page">
         <div class="header">
-            <h1 class="title">WeirdWebForum - friends</h1>
+            <h1 class="title">WeirdWebForum - feed</h1>
             <button class="back" onclick="back()">Back</button> 
         </div>
         <div class="messageContainer" id="messageContainer">
 
         </div>
         <div class="footer">
-
+            <button class="createPost" onclick="createPost()">Create post</button>
         </div>
     </div>
-    <%- include("friends.js.ejs"); %>
+    <%- include("feed.js.ejs"); %>
 </body>
 </html>

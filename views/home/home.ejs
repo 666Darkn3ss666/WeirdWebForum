@@ -1,12 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <%- include("home.css.ejs"); %>
+    
 </head>
 <body>
-    <h1>WORKS</h1>
+    <div class="page">
+        <div class="header">
+            <h1 class="title">WeirdWebForum - home</h1>
+        </div>
+        <div class="btnContainer">
+            <button class="navBtn" onclick="feed()">Feed</button>
+            <button class="navBtn" onclick="friends()">Friends</button>
+            <button class="navBtn" onclick="account()">Account</button>
+            <button class="navBtn" onclick="logout()">Log out</button>
+        </div>
+        <div class="msgContainer" id="msgContainer">
+            <h3 class="info">Info board</h3>
+        </div>
+        <div class="footer">
+
+        </div>
+    </div>
+    <%- include("home.js.ejs"); %>
 </body>
 </html>

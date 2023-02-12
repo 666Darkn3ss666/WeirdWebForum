@@ -1,0 +1,1 @@
+{"currentInfoNum":1,"posts":[{"id":0,"text":"Welcome to WF! This is where updates and info will be displayed."}]}

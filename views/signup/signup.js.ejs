@@ -11,12 +11,10 @@ async function signup() {
         body: JSON.stringify({username: username, password: password})
     })
         .then(res => res.json())
-        .then(data => {if (data.createdUser === false) {
-            alert("Account by that username already exists")
-        } else if (data.createdUser === true) {
-            alert("Account created, you can now log in")
+        .then(data => {
+            alert("User created with ID: " + data.id + "\nYou can now log in")
             location.pathname = "/login"
-        }})
+            })
 }
 
 </script>

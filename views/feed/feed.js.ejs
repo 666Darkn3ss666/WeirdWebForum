@@ -1,0 +1,119 @@
+<script>
+
+const userInfo = JSON.parse(localStorage.getItem("userInfo"))
+let username = ""
+let password = ""
+let id = 0
+
+const ja = JSON.parse(sessionStorage.getItem("ja"))
+
+if (userInfo != null) {
+    if ((ja === true) || (userInfo.remember === true)) {
+        username = userInfo.username
+        password = userInfo.password
+        id = userInfo.id
+    } else {
+        location.pathname = "/login"  
+    }
+} else {
+    location.pathname = "/login"
+}
+
+function back() {
+    location.pathname = "/home"
+}
+
+let lastPostId = 0
+let posts = []
+let newPosts = []
+let renderedPosts = []
+
+posts = JSON.parse(localStorage.getItem("posts"))
+
+if (posts === null) {
+    posts = [{id: 0, userID: 0, username: "SERVER", text: "Welcome!"}]
+}
+
+function renderPosts() {
+    posts.forEach((post) => {
+        if (!(renderedPosts.includes(post.id))) {
+            let msg = document.createElement("div")
+            msg.classList.add("post")
+            let from = document.createElement("p")
+            let fromText = document.createTextNode("From user " + post.username + " - id: " + post.userID)
+            from.append(fromText)
+            from.classList.add("from")
+            msg.append(from)
+            let text = document.createElement("p")
+            text.classList.add("text")
+            let textText = document.createTextNode(post.text)
+            text.append(textText)
+            msg.append(text)
+            document.getElementById("messageContainer").appendChild(msg)
+            renderedPosts.push(post.id)
+        }
+    })
+}
+
+function getPosts() {
+    fetch("/feed/getPosts", {
+    method: "post",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({lastPostId: lastPostId})
+})
+.then(res => res.json())
+.then(data => {
+    newPosts = data
+    processPosts()
+    })
+}
+
+function processPosts() {
+    //console.log(newPosts)
+    let postsAdded = 0
+    let postsLength = 0
+    posts.forEach((post) => {
+        postsLength++
+    })
+    newPosts.forEach((post) => {
+        if (post.id > posts[postsLength - 1].id) {
+            posts.push(post)
+            postsAdded++
+        }
+    })
+    lastPostId = posts[postsLength - 1].id
+    let postIndex = 0
+    posts.forEach((post) => {
+        if (post.id < (lastPostId - 50)) {
+            posts.splice(postIndex, 1)
+        }
+        postIndex++
+    })
+    //console.log(posts)
+    localStorage.setItem("posts", JSON.stringify(posts))
+    renderPosts()
+}
+
+function createPost() {
+    let text = prompt("Please input post text")
+    fetch("/feed/createPost", {
+        method: "post",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({userID: id, username: username, text: text})
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.result)
+    })
+}
+
+getPosts()
+setInterval(() => {
+    getPosts()
+}, 30000)
+
+</script>

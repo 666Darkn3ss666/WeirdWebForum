@@ -1,0 +1,69 @@
+<script>
+
+const userInfo = JSON.parse(localStorage.getItem("userInfo"))
+let username = ""
+let password = ""
+let id = 0
+
+const ja = JSON.parse(sessionStorage.getItem("ja"))
+
+if (userInfo != null) {
+    if ((ja === true) || (userInfo.remember === true)) {
+        username = userInfo.username
+        password = userInfo.password
+        id = userInfo.id
+    } else {
+        location.pathname = "/login"  
+    }
+} else {
+    location.pathname = "/login"
+}
+
+function feed() {
+    location.pathname = "/feed"
+}
+
+function friends() {
+    location.pathname = "/friends"
+}
+
+function account() {
+    location.pathname = "/account"
+}
+
+function logout() {
+    let userInfo = JSON.parse(localStorage.getItem("userInfo"))
+    userInfo.remember = false
+    localStorage.setItem("userInfo", JSON.stringify(userInfo))
+    location.pathname = "/login"
+}
+
+let info = []
+
+function getInfo() {
+    fetch("/home/getInfo", {
+        method: "post",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        info = data
+        renderInfo()
+    })
+}
+
+function renderInfo() {
+    info.forEach((post) => {
+        let msg = document.createElement("p")
+        let text = document.createTextNode(post.text)
+        msg.append(text)
+        msg.classList.add("msg")
+        document.getElementById("msgContainer").appendChild(msg)
+    })
+}
+
+getInfo()
+
+</script>

@@ -6,9 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    <input id="input">
-    <button id="stop" onclick="stop()">Stop server</button>
-    <button id="start" onclick="start()">Start server</button>
+    <input id="input" type="password">
+    <button onclick="stop()">Stop server</button>
+    <button onclick="start()">Start server</button>
+    <button onclick="newMsg()">Create new announcement</button>
     <p id="requests">Requests since server start: <%= requests %></p>
     <%- include("dev.js.ejs"); %>
 </body>

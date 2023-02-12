@@ -1,0 +1,65 @@
+<script>
+
+const userInfo = JSON.parse(localStorage.getItem("userInfo"))
+let username = ""
+let password = ""
+let id = 0
+
+const ja = JSON.parse(sessionStorage.getItem("ja"))
+
+if (userInfo != null) {
+    if ((ja === true) || (userInfo.remember === true)) {
+        username = userInfo.username
+        password = userInfo.password
+        id = userInfo.id
+    } else {
+        location.pathname = "/login"  
+    }
+} else {
+    location.pathname = "/login"
+}
+
+function back() {
+    location.pathname = "/home"
+}
+
+function changeUsername() {
+    const newUsername = prompt("Please input your new username")
+    if (newUsername != null) {
+        fetch("/account/changeUsername", {
+            method: "post",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({id: id, newUsername: newUsername})
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.result)
+        })
+    }
+}
+
+function deleteUser() {
+    if (confirm("Are you sure you want to delete your account?")) {
+        fetch("/account/deleteUser", {
+            method: "post",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({id: id})
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.result)
+            if (data.result == "Account deleted") {
+                location.pathname = "/login"
+            }
+        })
+    }
+}
+
+const idInfo = document.getElementById("idInfo")
+idInfo.innerText = "Your ID: " + id
+
+</script>
