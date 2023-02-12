@@ -40,7 +40,7 @@ function renderPosts() {
             let msg = document.createElement("div")
             msg.classList.add("post")
             let from = document.createElement("p")
-            let fromText = document.createTextNode("From user " + post.username + " - id: " + post.userID)
+            let fromText = document.createTextNode("From " + post.username + " - id: " + post.userID)
             from.append(fromText)
             from.classList.add("from")
             msg.append(from)

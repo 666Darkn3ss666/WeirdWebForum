@@ -1,6 +1,5 @@
 const fs = require("fs")
 const express = require("express")
-const { arch } = require("os")
 const app = express()
 
 app.set("view engine", "ejs")
@@ -28,7 +27,7 @@ fs.readFile("./info.txt", (err, data) => {
 
 app.get("/", (req, res) => {
     if (started === true) {
-    res.redirect("/login")
+    res.redirect("/home")
     requests++
     } else {
         res.redirect("/404")
@@ -105,7 +104,7 @@ app.get("/404", (req, res) => {
     if (started === false) {
     res.render("./404/404")
     } else {
-    res.redirect("/")
+    res.redirect("/home")
     }
 })
 
@@ -126,8 +125,6 @@ app.post("/users/login", (req, res) => {
         res.send(JSON.stringify({foundUser: false}))
         console.log("user not found")
     }
-    } else {
-    res.redirect("/404")
     }
 })
 
@@ -143,12 +140,11 @@ app.post("/users/signup", (req, res) => {
     userList.users.push({username: data.username, password: data.password, id: id})
     userList.nextID = id + 1
 
-    } else {
-    res.redirect("/404")
     }
 })
 
 app.post("/account/changeUsername", (req, res) => {
+    if (started === true) {
     const data = req.body
     let updated = false
     userList.users.forEach((user) => {
@@ -161,9 +157,10 @@ app.post("/account/changeUsername", (req, res) => {
     if (updated === false) {
         res.send(JSON.stringify({result: "Update not successful"}))
     }
-})
+}})
 
 app.post("/account/deleteUser", (req, res) => {
+    if (started === true) {
     const data = req.body
     let deleted = false
     userList.users.forEach((user) => {
@@ -176,9 +173,10 @@ app.post("/account/deleteUser", (req, res) => {
     if (deleted === false) {
         res.send(JSON.stringify({result: "Something went wrong"}))
     }
-})
+}})
 
 app.post("/feed/getPosts", (req, res) => {
+    if (started === true) {
     const data = req.body
     let postsToSend = []
     if (data.lastPostId == postList.currentPostNum) {
@@ -191,9 +189,10 @@ app.post("/feed/getPosts", (req, res) => {
         })
         res.send(JSON.stringify(postsToSend))
     }
-})
+}})
 
 app.post("/feed/createPost", (req, res) => {
+    if (started === true) {
     const data = req.body
     const userID = Number(data.userID)
     const user = data.username
@@ -205,7 +204,7 @@ app.post("/feed/createPost", (req, res) => {
     if (postList.currentPostNum === (postList.currentBatch * 50)) {
         archivePosts()
     }
-})
+}})
 
 app.post("/dev/admin", (req, res) => {
     const data = req.body
@@ -239,12 +238,13 @@ app.post("/dev/createAnnouncement", (req, res) => {
 })
 
 app.post("/home/getInfo", (req, res) => {
+    if (started === true) {
     let infoPack = []
     info.posts.forEach((post) => {
         infoPack.push(post)
     })
     res.send(JSON.stringify(infoPack))
-})
+}})
 
 function archivePosts() {
     let APosts = postList.posts
@@ -262,11 +262,15 @@ function archivePosts() {
 }
 
 function saveUsers() {
-    fs.writeFile("./users/users.txt", JSON.stringify(userList), (err) => {if (err != null) {console.log(err)}})
+    if (userList != "{}") {
+        fs.writeFile("./users/users.txt", JSON.stringify(userList), (err) => {if (err != null) {console.log(err)}})
+    }
 }
 
 function savePosts() {
-    fs.writeFile("./posts/currentPosts.txt", JSON.stringify(postList), (err) => {if (err != null) {console.log(err)}})
+    if (userList != "{}") {
+        fs.writeFile("./posts/currentPosts.txt", JSON.stringify(postList), (err) => {if (err != null) {console.log(err)}})
+    }
 }
 
 function save() {

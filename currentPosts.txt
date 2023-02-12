@@ -1,1 +1,1 @@
-{"currentPostNum":1,"posts":[{"id":0,"userID":0,"username":"SERVER","text":"Welcome!"}]}
+{"currentPostNum":1, "currentBatch":1, "posts":[{"id":0,"userID":0,"username":"SERVER","text":"Welcome!"}]}

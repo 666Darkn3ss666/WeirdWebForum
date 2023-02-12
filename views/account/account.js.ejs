@@ -36,6 +36,8 @@ function changeUsername() {
         .then(res => res.json())
         .then(data => {
             alert(data.result)
+            username = newUsername
+            localStorage.setItem("userInfo", JSON.stringify({remember: userInfo.remember, username: username, password: password, id: id}))
         })
     }
 }
