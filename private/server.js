@@ -133,13 +133,11 @@ app.post("/users/signup", (req, res) => {
     console.log("user signup request recieved")
     requests++
     const data = req.body
-    
     const id = userList.nextID
     res.send(JSON.stringify({id: id}))
-    console.log("creating user")
     userList.users.push({username: data.username, password: data.password, id: id})
     userList.nextID = id + 1
-
+    console.log("user created")
     }
 })
 
@@ -222,7 +220,7 @@ app.post("/dev/admin", (req, res) => {
             console.log("Server started")
         }
     } else {
-        res.send("Wroung password")
+        res.send("Wrong password")
     }
 })
 
