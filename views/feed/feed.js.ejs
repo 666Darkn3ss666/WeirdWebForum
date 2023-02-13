@@ -86,7 +86,7 @@ function processPosts() {
     lastPostId = posts[postsLength - 1].id
     let postIndex = 0
     posts.forEach((post) => {
-        if (post.id < (lastPostId - 50)) {
+        if (post.id < (lastPostId - 100)) {
             posts.splice(postIndex, 1)
         }
         postIndex++
@@ -98,6 +98,7 @@ function processPosts() {
 
 function createPost() {
     let text = prompt("Please input post text")
+    if (text != "") {
     fetch("/feed/createPost", {
         method: "post",
         headers: {
@@ -109,6 +110,7 @@ function createPost() {
     .then(data => {
         alert(data.result)
     })
+    }
 }
 
 getPosts()

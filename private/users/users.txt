@@ -1,1 +1,1 @@
-{"nextID":1,"users":[{"id":0,"username":"SERVER","password":"060405050604050"}]}
+{"nextID":2,"users":[{"id":0,"username":"SERVER","password":"060405050604050"},{"username":"Mum","password":"1234","id":1}]}

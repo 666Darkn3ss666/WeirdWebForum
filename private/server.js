@@ -199,7 +199,7 @@ app.post("/feed/createPost", (req, res) => {
     postList.currentPostNum++
     postList.posts.push({id: postID, userID: userID, username: user, text: text})
     res.send(JSON.stringify({result: "Post created"}))
-    if (postList.currentPostNum === (postList.currentBatch * 50)) {
+    if (postList.currentPostNum === (postList.currentBatch * 100)) {
         archivePosts()
     }
 }})
