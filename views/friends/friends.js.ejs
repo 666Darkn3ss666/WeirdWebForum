@@ -23,4 +23,76 @@ function back() {
     location.pathname = "/home"
 }
 
+function requests() {
+    location.pathname = "/friends/requests"
+}
+
+function chat(id) {
+    console.log("Chatting with " + id)
+}
+
+function remove(id) {
+    console.log("Removing " + id)
+}
+
+function renderFriends(friends) {
+    friends.forEach((friend) => {
+        let msg = document.createElement("div")
+        msg.classList.add("friend")
+        let name = document.createElement("p")
+        name.classList.add("text")
+        let nameText = document.createTextNode(friend.username + " - id: " + friend.id)
+        name.append(nameText)
+        msg.append(name)
+        let space = document.createElement("div")
+        space.classList.add("space")
+        msg.append(space)
+        let chat = document.createElement("button")
+        chat.classList.add("button")
+        chat.setAttribute("onclick", "chat(" + friend.id + ")")
+        let chatText = document.createTextNode("Chat")
+        chat.append(chatText)
+        msg.append(chat)
+        let remove = document.createElement("button")
+        remove.classList.add("button")
+        remove.setAttribute("onclick", "remove(" + friend.id + ")")
+        let removeText = document.createTextNode("Remove")
+        remove.append(removeText)
+        msg.append(remove)
+        document.getElementById("friendContainer").appendChild(msg)
+    })
+}
+
+function addFriend() {
+    const friendId = prompt("Input user ID")
+    fetch("/friends/addFriend", {
+        method: "post",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({id: id, username: username, friendId: friendId})
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log(data)
+    })
+}
+
+function getFriends() {
+    fetch("/friends/getFriends", {
+        method: "post",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({id: id})
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log(data)
+        renderFriends(data)
+    })
+}
+
+getFriends()
+
 </script>

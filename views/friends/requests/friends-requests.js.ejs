@@ -1,0 +1,105 @@
+<script>
+
+const userInfo = JSON.parse(localStorage.getItem("userInfo"))
+let username = ""
+let password = ""
+let id = 0
+
+const ja = JSON.parse(sessionStorage.getItem("ja"))
+
+if (userInfo != null) {
+    if ((ja === true) || (userInfo.remember === true)) {
+        username = userInfo.username
+        password = userInfo.password
+        id = userInfo.id
+    } else {
+        location.pathname = "/login"  
+    }
+} else {
+    location.pathname = "/login"
+}
+
+function back() {
+    location.pathname = "/friends"
+}
+
+function accept(friendId, friendUsername) {
+    fetch("/friends/manageRequest", {
+        method: "post",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({verdict: true, id: friendId, username: friendUsername, friendId: id, friendUsername: username})
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log(data.result)
+        document.getElementById("requestContainer").replaceChildren()
+        renderRequests(data.requests)
+    })
+}
+
+function deny(friendId, friendUsername) {
+    fetch("/friends/manageRequest", {
+        method: "post",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({verdict: false, id: friendId, username: friendUsername, friendId: id, friendUsername: username})
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log(data.result)
+        document.getElementById("requestContainer").replaceChildren()
+        renderRequests(data.requests)
+    })
+}
+
+function renderRequests(requests) {
+    requests.forEach((request) => {
+        let msg = document.createElement("div")
+        msg.classList.add("request")
+        let name = document.createElement("p")
+        name.classList.add("text")
+        let nameText = document.createTextNode(request.username + " - id: " + request.id)
+        name.append(nameText)
+        msg.append(name)
+        let space = document.createElement("div")
+        space.classList.add("space")
+        msg.append(space)
+        let accept = document.createElement("button")
+        accept.classList.add("button")
+        accept.setAttribute("onclick", "accept(" + request.id + ", '" + request.username + "')")
+        let acceptText = document.createTextNode("Accept")
+        accept.append(acceptText)
+        msg.append(accept)
+        let reject = document.createElement("button")
+        reject.classList.add("button")
+        reject.setAttribute("onclick", "deny(" + request.id + ", '" + request.username + "')")
+        let rejectText = document.createTextNode("Reject")
+        reject.append(rejectText)
+        msg.append(reject)
+        document.getElementById("requestContainer").appendChild(msg)
+    })
+}
+
+function getRequests() {
+    fetch("/friends/getRequests", {
+        method: "post",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({id: id})
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log(data)
+        if (data.result != false) {
+            renderRequests(data.result)
+        }
+    })
+}
+
+getRequests()
+
+</script>

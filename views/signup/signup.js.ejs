@@ -12,9 +12,13 @@ async function signup() {
     })
         .then(res => res.json())
         .then(data => {
+            if (data.result == true) {
             alert("User created with ID: " + data.id + "\nYou can now log in")
             location.pathname = "/login"
-            })
+            } else {
+                alert("Username can only contain the characters 0-9, a-z, and A-Z.\nPassword cannot contain spaces")
+            }})
+        
 }
 
 </script>

@@ -74,6 +74,16 @@ app.get("/friends", (req, res) => {
     }
 })
 
+app.get("/friends/requests", (req, res) => {
+    if (started === true) {
+    console.log("friend requests page accessed")
+    requests++
+    res.render("./friends/requests/friends-requests")
+    } else {
+    res.redirect("/404")
+    }
+})
+
 app.get("/account", (req, res) => {
     if (started === true) {
     console.log("account page accessed")
@@ -133,12 +143,16 @@ app.post("/users/signup", (req, res) => {
     console.log("user signup request recieved")
     requests++
     const data = req.body
+    if ((/^[0-9a-zA-Z]+$/.test(data.username)) || !(data.password.includes(" "))) {
     const id = userList.nextID
-    res.send(JSON.stringify({id: id}))
-    userList.users.push({username: data.username, password: data.password, id: id})
+    res.send(JSON.stringify({result: true, id: id}))
+    userList.users.push({username: data.username, password: data.password, id: id, friends: [], requests: []})
     userList.nextID = id + 1
     console.log("user created")
-    }
+    fs.mkdir("./chats/" + id, {}, (err) => {if (err != null) {console.log(err)}})
+    } else {
+        res.send(JSON.stringify({result: false}))
+    }}
 })
 
 app.post("/account/changeUsername", (req, res) => {
@@ -243,6 +257,147 @@ app.post("/home/getInfo", (req, res) => {
     })
     res.send(JSON.stringify(infoPack))
 }})
+
+app.post("/friends/getFriends", (req, res) => {
+    if (started === true) {
+        let found = false
+        const data = req.body
+        userList.users.forEach((user) => {
+            if (data.id == user.id) {
+                res.send(JSON.stringify(user.friends))
+                found = true
+            }
+        })
+        if (found = false) {
+            res.send(JSON.stringify({result: "no friends :("}))
+        }
+    }
+})
+
+app.post("/friends/getRequests", (req, res) => {
+    if (started === true) {
+        const data = req.body
+        let found = false
+        userList.users.forEach((user) => {
+            if (data.id == user.id) {
+                let reqIndex = 0
+                user.requests.forEach((request) => {
+                    user.friends.forEach((friend) => {
+                        if (friend.id == request.id) {
+                            user.requests.splice(reqIndex, 1)
+                        }
+                    })
+                    reqIndex++
+                })
+                res.send(JSON.stringify({result: user.requests}))
+                found = true
+            }
+        })
+        if (found = false) {
+            res.send(JSON.stringify({result: false}))
+        }
+    }
+})
+
+app.post("/friends/manageRequest", (req, res) => {
+    if (started === true) {
+        const data = req.body
+        if (data.verdict == true) {
+            userList.users.forEach((user) => {
+                if (user.id == data.id) {
+                    user.friends.push({id: data.friendId, username: data.friendUsername})
+                }
+                if (user.id == data.friendId) {
+                    user.friends.push({id: data.id, username: data.username})
+                    let index = 0
+                    user.requests.forEach((request) => {
+                        if (request.id == data.id) {
+                            user.requests.splice(index, 1)
+                            res.send(JSON.stringify({result: "Request accepted", requests: user.requests}))
+                        }
+                        index++
+                    })
+                }
+            })
+        } else {
+            userList.users.forEach((user) => {
+                if (user.id == data.friendId) {
+                    let index = 0
+                    user.requests.forEach((request) => {
+                        if (request.id == data.id) {
+                            user.requests.splice(index, 1)
+                            res.send(JSON.stringify({result: "Request denied", requests: user.requests}))
+                        }
+                        index++
+                    })
+                }
+            })
+        }
+    }
+})
+
+app.post("/friends/addFriend", (req, res) => {
+    if (started === true) {
+        const data = req.body
+        let found = false
+        if (data.id == data.friendId) {
+            res.send(JSON.stringify({result: "You cannot add yourself"}))
+        } else {
+        let alreadyRequested = false
+        let alreadyFriends = false
+        userList.users.forEach((user) => {
+            if (data.friendId == user.id) {
+                found = true
+                user.requests.forEach((request) => {
+                    if (request.id == data.id) {
+                        alreadyRequested = true
+                    }
+                })
+                user.friends.forEach((friend) => {
+                    if (friend.id == data.id) {
+                        alreadyFriends = true
+                    }
+                })
+                if ((alreadyRequested === false) && (alreadyFriends === false)) {
+                    user.requests.push({id: data.id, username: data.username})
+                }
+            }
+        })
+        if (found === false) {
+            res.send(JSON.stringify({result: "User not found"}))
+        } else if (alreadyFriends === true) {
+            res.send(JSON.stringify({result: "Already friends"}))
+        } else if (alreadyRequested === true) {
+            res.send(JSON.stringify({result: "Already requested"}))
+        } else {
+            res.send(JSON.stringify({result: "Friend request sent"}))
+        }}
+    }
+})
+
+app.post("/friends/removeFriend", (req, res) => {
+    if (started === true) {
+        const data = req.body
+        let removed = false
+        userList.users.forEach((user) => {
+            if ((user.id == data.id) || (user.id == data.friendId)) {
+                let index = 0
+                user.friends.forEach((friend) => {
+                    if ((friend.id == data.id) || (friend.id == data.friendId)) {
+                        user.friends.splice(index, 1)
+                        removed = true
+                    }
+                    index++
+                }) 
+            }
+        })
+        if (removed === true) {
+            res.send(JSON.stringify({result: "Removed friend"}))
+        } else {
+            res.send(JSON.stringify({result: "Something went wrong"}))
+        }
+    }
+})
 
 function archivePosts() {
     let APosts = postList.posts

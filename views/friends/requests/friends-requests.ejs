@@ -2,23 +2,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <%- include("friends.css.ejs"); %>
+    <%- include("friends-requests.css.ejs"); %>
     
 </head>
 <body>
     <div class="page">
         <div class="header">
             <h1 class="title">WeirdWebForum - friends</h1>
-            <button class="back" onclick="back()">Back</button>
-            <button class="back" onclick="requests()">Requests</button>
+            <button class="back" onclick="back()">Back</button> 
         </div>
-        <div class="friendContainer" id="friendContainer">
+        <div class="requestContainer" id="requestContainer">
 
         </div>
         <div class="footer">
-            <button class="addFriend" onclick="addFriend()">Add friend</button>
+
         </div>
     </div>
-    <%- include("friends.js.ejs"); %>
+    <%- include("friends-requests.js.ejs"); %>
 </body>
 </html>
