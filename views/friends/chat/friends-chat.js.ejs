@@ -19,8 +19,115 @@ if (userInfo != null) {
     location.pathname = "/login"
 }
 
+let friendId
+let friendUsername
+
+if (localStorage.getItem("friendInfo") != null) {
+    let friendInfo = JSON.parse(localStorage.getItem("friendInfo"))
+    friendId = friendInfo.friendId
+    friendUsername = friendInfo.friendUsername
+    document.querySelector(".title").innerHTML = "WeirdWebForum - chat with " + friendUsername
+} else {
+    back()
+}
+
 function back() {
     location.pathname = "/friends"
 }
 
+let lastMessageId = 0
+let messages = []
+let newMessages = []
+let renderedMessages = []
+
+messages = JSON.parse(localStorage.getItem(id + "-" + friendId))
+
+if (messages == null) {
+    messages = [{id: 0, userId: 0, username: "SERVER", text: "Welcome to the chat! Here you can start your conversation with your friend"}]
+}
+
+function renderMessages() {
+    messages.forEach((message) => {
+        if (!(renderedMessages.includes(message.id))) {
+            let msg = document.createElement("div")
+            msg.classList.add("message")
+            let from = document.createElement("p")
+            let fromText = document.createTextNode("From " + message.username + " - id: " + message.userId)
+            from.append(fromText)
+            from.classList.add("from")
+            msg.append(from)
+            let text = document.createElement("p")
+            text.classList.add("text")
+            let textText = document.createTextNode(message.text)
+            text.append(textText)
+            msg.append(text)
+            document.getElementById("messageContainer").appendChild(msg)
+            renderedMessages.push(message.id)
+        }
+    })
+}
+
+function getMessages() {
+    fetch("/friends/chat/getMessages", {
+    method: "post",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({lastMessageId: lastMessageId, id: id, friendId, friendId})
+})
+.then(res => res.json())
+.then(data => {
+    if (data.result == true) {
+        newMessages = data.messages
+        processMessages()
+    } else {
+        console.log(data.result)
+    }})
+}
+
+function processMessages() {
+    let messagesAdded = 0
+    let messagesLength = 0
+    messages.forEach((message) => {
+        messagesLength++
+    })
+    newMessages.forEach((message) => {
+        if (message.id > messages[messagesLength - 1].id) {
+            messages.push(message)
+            messagesAdded++
+        }
+    })
+    lastMessageId = messages[messagesLength - 1].id
+    let messageIndex = 0
+    messages.forEach((message) => {
+        if (message.id < (lastMessageId - 250)) {
+            messages.splice(messageIndex, 1)
+        }
+        messageIndex++
+    })
+    localStorage.setItem(id + "-" + friendId, JSON.stringify(messages))
+    renderMessages()
+}
+
+function sendMessage() {
+    let text = prompt("Please input message text")
+    if (text != "") {
+    fetch("/friends/chat/sendMessage", {
+        method: "post",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({id: id, friendId: friendId, username: username, text: text})
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log(data.result)
+    })
+    }
+}
+
+getMessages()
+setInterval(() => {
+    getMessages()
+}, 30000)
 </script>

@@ -84,6 +84,16 @@ app.get("/friends/requests", (req, res) => {
     }
 })
 
+app.get("/friends/chat", (req, res) => {
+    if (started === true) {
+    console.log("friend chat page accessed")
+    requests++
+    res.render("./friends/chat/friends-chat")
+    } else {
+    res.redirect("/404")
+    }
+})
+
 app.get("/account", (req, res) => {
     if (started === true) {
     console.log("account page accessed")
@@ -169,6 +179,13 @@ app.post("/account/changeUsername", (req, res) => {
     if (updated === false) {
         res.send(JSON.stringify({result: "Update not successful"}))
     }
+    userList.users.forEach((user) => {
+        user.friends.forEach((friend) => {
+            if (friend.id == data.id) {
+                friend.username = data.newUsername
+            }
+        })
+    })
 }})
 
 app.post("/account/deleteUser", (req, res) => {
@@ -306,9 +323,11 @@ app.post("/friends/manageRequest", (req, res) => {
             userList.users.forEach((user) => {
                 if (user.id == data.id) {
                     user.friends.push({id: data.friendId, username: data.friendUsername})
+                    fs.writeFile("./chats/" + data.id + "/" + data.friendId + ".txt", JSON.stringify({currentMessageNum: 1, messages: [{id: 0, userId: 0, username: "SERVER", text: "Welcome to the chat! Here you can start your conversation with your friend"}]}), (err) => {if (err != null) {console.log(err)}})
                 }
                 if (user.id == data.friendId) {
                     user.friends.push({id: data.id, username: data.username})
+                    fs.writeFile("./chats/" + data.friendId + "/" + data.id + ".txt", JSON.stringify({currentMessageNum: 1, messages: [{id: 0, userId: 0, username: "SERVER", text: "Welcome to the chat! Here you can start your conversation with your friend"}]}), (err) => {if (err != null) {console.log(err)}})
                     let index = 0
                     user.requests.forEach((request) => {
                         if (request.id == data.id) {
@@ -379,6 +398,7 @@ app.post("/friends/removeFriend", (req, res) => {
     if (started === true) {
         const data = req.body
         let removed = false
+        let userFriends
         userList.users.forEach((user) => {
             if ((user.id == data.id) || (user.id == data.friendId)) {
                 let index = 0
@@ -386,16 +406,52 @@ app.post("/friends/removeFriend", (req, res) => {
                     if ((friend.id == data.id) || (friend.id == data.friendId)) {
                         user.friends.splice(index, 1)
                         removed = true
+                        userFriends = user.friends
                     }
                     index++
                 }) 
             }
         })
         if (removed === true) {
-            res.send(JSON.stringify({result: "Removed friend"}))
+            res.send(JSON.stringify({result: "Removed friend", friends: userFriends}))
         } else {
             res.send(JSON.stringify({result: "Something went wrong"}))
         }
+    }
+})
+
+app.post("/friends/chat/getMessages", (req, res) => {
+    if (started === true) {
+        const data = req.body
+        let messages
+        let messagesToSend = []
+        fs.readFile("./chats/" + data.id + "/" + data.friendId + ".txt", (err, readData) => {
+            messages = JSON.parse(readData.toString())
+            if (data.lastMessageId == messages.currentMessageNum) {
+                res.send(JSON.stringify({result: "Up to date"}))
+            } else {
+            messages.messages.forEach((message) => {
+                if (message.id >= data.lastMessageId) {
+                    messagesToSend.push(message)
+                }
+            })
+            res.send(JSON.stringify({result: true, messages: messagesToSend}))
+        }})
+    }
+})
+
+app.post("/friends/chat/sendMessage", (req, res) => {
+    if (started === true) {
+        const data = req.body
+        let messages
+        fs.readFile("./chats/" + data.id + "/" + data.friendId + ".txt", (err, readData) => {
+            messages = JSON.parse(readData.toString())
+            messages.messages.push({id: messages.currentMessageNum, userId: data.id, username: data.username, text: data.text})
+            messages.currentMessageNum++
+            fs.writeFile("./chats/" + data.id + "/" + data.friendId + ".txt", JSON.stringify(messages), (err) => {if (err) {console.log(err)}})
+            fs.writeFile("./chats/" + data.friendId + "/" + data.id + ".txt", JSON.stringify(messages), (err) => {if (err) {console.log(err)}})
+            res.send(JSON.stringify({result: "Message sent"}))
+        })
     }
 })
 

@@ -71,7 +71,6 @@ function getPosts() {
 }
 
 function processPosts() {
-    //console.log(newPosts)
     let postsAdded = 0
     let postsLength = 0
     posts.forEach((post) => {
@@ -91,7 +90,6 @@ function processPosts() {
         }
         postIndex++
     })
-    //console.log(posts)
     localStorage.setItem("posts", JSON.stringify(posts))
     renderPosts()
 }

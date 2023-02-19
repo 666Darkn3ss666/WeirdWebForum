@@ -3,19 +3,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <%- include("friends-chat.css.ejs"); %>
-    
 </head>
 <body>
     <div class="page">
         <div class="header">
-            <h1 class="title">WeirdWebForum - friends</h1>
+            <h1 class="title">WeirdWebForum - (friend's username)</h1>
             <button class="back" onclick="back()">Back</button> 
         </div>
         <div class="messageContainer" id="messageContainer">
 
         </div>
         <div class="footer">
-
+            <button class="sendMessage" onclick="sendMessage()">Send message</button>
         </div>
     </div>
     <%- include("friends-chat.js.ejs"); %>

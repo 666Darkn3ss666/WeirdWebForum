@@ -16,7 +16,7 @@ async function signup() {
             alert("User created with ID: " + data.id + "\nYou can now log in")
             location.pathname = "/login"
             } else {
-                alert("Username can only contain the characters 0-9, a-z, and A-Z.\nPassword cannot contain spaces")
+                alert("Username can only contain the characters 0-9, a-z, and A-Z, and cannot be over 15 characters long.\nPassword cannot contain spaces.")
             }})
         
 }

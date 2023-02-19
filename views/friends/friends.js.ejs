@@ -19,6 +19,8 @@ if (userInfo != null) {
     location.pathname = "/login"
 }
 
+localStorage.setItem("friendInfo", "")
+
 function back() {
     location.pathname = "/home"
 }
@@ -27,12 +29,28 @@ function requests() {
     location.pathname = "/friends/requests"
 }
 
-function chat(id) {
-    console.log("Chatting with " + id)
+function chat(friendId, friendUsername) {
+    localStorage.setItem("friendInfo", JSON.stringify({friendId: friendId, friendUsername: friendUsername}))
+    location.pathname = "/friends/chat"
 }
 
-function remove(id) {
-    console.log("Removing " + id)
+function remove(friendId) {
+    fetch("/friends/removeFriend", {
+        method: "post",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({id: friendId, friendId: id})
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log(data.result)
+        if (data.result == "Removed friend") {
+            localStorage.setItem(id + "-" + friendId, JSON.stringify([{id: 0, userId: 0, username: "SERVER", text: "Welcome to the chat! Here you can start your conversation with your friend"}]))
+            document.getElementById("friendContainer").replaceChildren()
+            renderFriends(data.friends)
+        }
+    })
 }
 
 function renderFriends(friends) {
@@ -49,7 +67,7 @@ function renderFriends(friends) {
         msg.append(space)
         let chat = document.createElement("button")
         chat.classList.add("button")
-        chat.setAttribute("onclick", "chat(" + friend.id + ")")
+        chat.setAttribute("onclick", "chat(" + friend.id + ", '" + friend.username + "')")
         let chatText = document.createTextNode("Chat")
         chat.append(chatText)
         msg.append(chat)
